@@ -6,7 +6,7 @@ import products from '../../data/products.json'
 const shopSlice = createSlice({
     name: "shop",
     initialState: {
-        //categories:categories,
+       // categories:categories,
         categories,
         products,
         categorySelected: "",

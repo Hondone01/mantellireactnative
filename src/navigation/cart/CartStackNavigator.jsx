@@ -9,7 +9,7 @@ const CartStackNavigator = () => {
         <Stack.Navigator
             initialRouteName="Carrito"
             screenOptions={{
-                header: ({route})=>(<Header title="Mundo Geek" subtitle={route.name}/>)
+                header: ({route})=>(<Header title="C-Monster" subtitle={route.name}/>)
             }}
         >
             <Stack.Screen name="Carrito" component={CartScreen} />
