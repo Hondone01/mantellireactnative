@@ -1,0 +1,17 @@
+[
+    {
+        "id":1,
+        "title":"Sustratos",
+        "image":"https://gardem.com.uy/wp-content/uploads/2024/06/fibraCocoDetalle2.jpg"
+    },
+    {
+        "id":2,
+        "title":"Fertilizantes",
+        "image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRt3sqkfO8EIjd_Dv_dOTaQOxbdS6hypRnCUw&s"
+    },
+    {
+        "id":3,
+        "title":"Parafernalia",
+        "image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzYx0cdy96RdlceW33M4Fu0K9fgNorkf-v_g&s"
+    }
+]
