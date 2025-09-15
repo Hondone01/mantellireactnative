@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import { colors } from '../global/colors'
 import { useNavigation } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/Feather'
+import {Feather} from '@expo/vector-icons'
 
 const Header = ({ title, subtitle }) => {
   const navigation = useNavigation()
@@ -28,7 +28,7 @@ const Header = ({ title, subtitle }) => {
       <View style={styles.right}>
         {canGoBack && (
           <Pressable onPress={() => navigation.goBack()}>
-            <Icon name="arrow-left-circle" size={32} color={colors.white} />
+            <Feather name="arrow-left-circle" size={32} color={colors.white} />
           </Pressable>
         )}
       </View>
