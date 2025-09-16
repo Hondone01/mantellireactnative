@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
         color: colors.white,
         fontSize: 48,
     },
-    profileData: {
+       profileData: {
         paddingVertical: 16,
         fontSize: 16
     },

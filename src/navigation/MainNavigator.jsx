@@ -5,6 +5,8 @@ import { useSelector, useDispatch} from "react-redux";
 import { useGetProfilePictureQuery } from "../services/profileApi";
 import { setImage, setLocalId } from "../store/slices/userSlice";
 import { useEffect,useState } from "react";
+import { initSessionTable, getSession } from "../db"
+import { setUserEmail } from "../store/slices/userSlice";
 
 
 const MainNavigator = () => {
@@ -15,7 +17,20 @@ const MainNavigator = () => {
 
     const { data: profilePicture, isLoading, error } = useGetProfilePictureQuery(localId)
 
-    console.log("ProfilePicture desde Firebase", profilePicture)
+    useEffect(() => {
+        const bootstrap = async () => {
+            await initSessionTable();
+            const session = await getSession(); //En SQLite
+            if (session) {
+                console.log("Session:", session)
+                dispatch(setUserEmail(session.email))
+                dispatch(setLocalId(session.localId))
+            }
+           // setCheckingSession(false);
+        };
+
+        bootstrap();
+    }, []);
 
      useEffect(() => {
         if (profilePicture) {
