@@ -44,34 +44,47 @@ const ProfileScreen = () => {
         }
     }
 
-    useEffect(() => {
-        async function getCurrentLocation() {
-            try {
-                let { status } = await Location.requestForegroundPermissionsAsync();
-                if (status !== 'granted') {
-                    setErrorMsg('Los permisos fueron denegados');
-                    return;
-                }
+     useEffect(() => {
+  async function getCurrentLocation() {
+    try {
+      // 1. Pedimos permisos
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Los permisos fueron denegados');
+        return;
+      }
 
-                let location = await Location.getCurrentPositionAsync({});
-                if (location) {
-                    const response = await fetch(
-                        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${process.env.EXPO_PUBLIC_MAPS_KEY}`
-                    );
-                    const data = await response.json()
-                    //console.log("Data desde geocoding", data)
-                    setLocation(location)
-                    setAddress(data.results[0].formatted_address)
-                }
-            } catch (error) {
-                console.log("Error al obtener la ubicación:", error);
-            } finally {
-                setLocationLoaded(true);
-            }
+      // 2. Obtenemos coords actuales
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      if (currentLocation) {
+        // 3. Hacemos request a Geocoding API
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${currentLocation.coords.latitude},${currentLocation.coords.longitude}&key=${process.env.EXPO_PUBLIC_MAPS_KEY}`
+        );
+
+        const data = await response.json();
+        console.log("Respuesta Geocoding:", JSON.stringify(data, null, 2));
+
+        setLocation(currentLocation);
+
+        // 4. Validamos resultados
+        if (data.status === "OK" && data.results?.length > 0) {
+          setAddress(data.results[0].formatted_address);
+        } else {
+          console.log("Google Maps no devolvió resultados:", data.status);
+          setAddress("Dirección no disponible");
         }
+      }
+    } catch (error) {
+      console.log("Error al obtener la ubicación:", error);
+      setErrorMsg("Hubo un error al obtener la ubicación");
+    } finally {
+      setLocationLoaded(true);
+    }
+  }
 
-        getCurrentLocation();
-    }, []);
+  getCurrentLocation();
+}, []);
 
     return (
         <View style={styles.profileContainer}>

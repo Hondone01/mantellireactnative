@@ -1,18 +1,32 @@
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native'
 import { colors } from '../global/colors'
 import { useNavigation } from '@react-navigation/native'
+import Icon from 'react-native-vector-icons/Feather'
 import {Feather} from '@expo/vector-icons'
+import { clearSession } from '../db'
 
 const Header = ({ title, subtitle }) => {
   const navigation = useNavigation()
   const canGoBack = navigation.canGoBack()
+
+   const handleClearSession = async () => {
+    try {
+      dispatch(clearUser())
+      await clearSession()
+      
+    } catch {
+
+      console.log("Hubo un error al limpiar la sesión")
+    }
+
+  }
 
   return (
     <View style={styles.container}>
       {/* LOGO */}
       <View style={styles.left}>
         <Image
-          source={require('../../assets/logomonster.png')}
+          source={require('../../assets/icon.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -31,6 +45,7 @@ const Header = ({ title, subtitle }) => {
             <Feather name="arrow-left-circle" size={32} color={colors.white} />
           </Pressable>
         )}
+        <Pressable style={styles.logout} onPress={handleClearSession}><Icon name="log-out" size={32} color={colors.white} /></Pressable>
       </View>
     </View>
   )

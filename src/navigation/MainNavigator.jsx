@@ -7,11 +7,13 @@ import { setImage, setLocalId } from "../store/slices/userSlice";
 import { useEffect,useState } from "react";
 import { initSessionTable, getSession } from "../db"
 import { setUserEmail } from "../store/slices/userSlice";
-
+import { ActivityIndicator, View } from "react-native";
+import { colors } from "../global/colors";
 
 const MainNavigator = () => {
     const email = useSelector(state => state.userReducer.email)
     const localId = useSelector(state => state.userReducer.localId)
+    const [checkingSession, setCheckingSession] = useState(true);
 
     const dispatch = useDispatch()
 
@@ -26,7 +28,7 @@ const MainNavigator = () => {
                 dispatch(setUserEmail(session.email))
                 dispatch(setLocalId(session.localId))
             }
-           // setCheckingSession(false);
+            setCheckingSession(false);
         };
 
         bootstrap();
@@ -37,6 +39,14 @@ const MainNavigator = () => {
             dispatch(setImage(profilePicture.image))
         }
     }, [profilePicture])
+    
+    if (checkingSession) {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color={colors.cobaltBlue} />
+            </View>
+        );
+    }
    
 
     return (
