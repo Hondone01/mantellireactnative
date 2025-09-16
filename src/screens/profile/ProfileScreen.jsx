@@ -1,19 +1,26 @@
-import { StyleSheet, View, Text, Pressable, Image } from 'react-native'
+import { StyleSheet, Text, View, Pressable, Image, ActivityIndicator } from 'react-native'
 import { colors } from '../../global/colors'
 import CameraIcon from '../../components/CameraIcon'
-import { useState,useEffect } from 'react'
-import { useSelector,useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import * as ImagePicker from 'expo-image-picker';
 import { usePutProfilePictureMutation } from '../../services/profileApi'
 import { setImage } from '../../store/slices/userSlice'
-
+import MapView, { Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const ProfileScreen = () => {
+  const [location, setLocation] = useState("")
+  const [errorMsg, setErrorMsg] = useState("");
+  const [address, setAddress] = useState("")
+  const [locationLoaded, setLocationLoaded] = useState(false)
 
   const user = useSelector(state => state.userReducer.email)
-  const localId = useSelector(state=>state.userReducer.localId)
+  const localId = useSelector(state => state.userReducer.localId)
   const image = useSelector(state => state.userReducer.image)
+
   const [triggerPutProfilePicture, result] = usePutProfilePictureMutation()
+
   const dispatch = useDispatch()
 
 
@@ -31,9 +38,39 @@ const ProfileScreen = () => {
     if (!result.canceled) {
       const imgBase64 = `data:image/jpeg;base64,${result.assets[0].base64}`
       dispatch(setImage(imgBase64))
-      triggerPutProfilePicture({ localId: localId, image: imgBase64 })  
+      triggerPutProfilePicture({ localId: localId, image: imgBase64 })
     }
   }
+
+  useEffect(() => {
+    async function getCurrentLocation() {
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMsg('Los permisos fueron denegados');
+          return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        if (location) {
+          const response = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.coords.latitude},${location.coords.longitude}&key=${process.env.EXPO_PUBLIC_MAPS_KEY}`
+          );
+          const data = await response.json()
+          //console.log("Data desde geocoding", data)
+          setLocation(location)
+          setAddress(data.results[0].formatted_address)
+        }
+      } catch (error) {
+        console.log("Error al obtener la ubicación:", error);
+      } finally {
+        setLocationLoaded(true);
+      }
+    }
+
+    getCurrentLocation();
+  }, [location]);
+
   return (
     <View style={styles.profileContainer}>
       <View style={styles.imageProfileContainer}>
@@ -49,6 +86,36 @@ const ProfileScreen = () => {
         </Pressable>
       </View>
       <Text style={styles.profileData}>Email: {user}</Text>
+      <View style={styles.mapContainer}>
+        {
+          location
+            ?
+            <MapView
+              style={styles.map}
+              initialRegion={{
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+            >
+              <Marker coordinate={{ "latitude": location.coords.latitude, "longitude": location.coords.longitude }} title={"Mundo Geek"} />
+            </MapView>
+            :
+            (
+              locationLoaded
+                ?
+                <Text>Hubo un problema al obtener la ubicación</Text>
+                :
+                <ActivityIndicator />
+            )
+        }
+        <View style={styles.placeDescriptionContainer}>
+          <View style={styles.addressContainer}>
+            <Text style={styles.address}>{address || ""}</Text>
+          </View>
+        </View>
+      </View>
     </View>
   )
 }
