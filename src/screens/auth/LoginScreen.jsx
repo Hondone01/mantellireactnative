@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, Pressable, Dimensions, Switch } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Pressable, Dimensions, Switch, ImageBackground } from 'react-native'
 import { colors } from '../../global/colors';
 import { useEffect, useState } from 'react';
 import { useLoginMutation } from '../../services/authApi';
@@ -6,9 +6,12 @@ import { useDispatch } from 'react-redux';
 import { setUserEmail, setLocalId } from '../../store/slices/userSlice';
 import { saveSession, clearSession } from '../../db';
 
+// Ajusta la ruta de tu imagen de fondo aquí
+import bgImage from '../../../assets/duende_cannabis_monstruoso1.jpg';
+
 const textInputWidth = Dimensions.get('window').width * 0.7
 
-const LoginScreen = ({ navigation, route }) => {
+const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [persistSession, setPersistSession] = useState(false)
@@ -16,13 +19,11 @@ const LoginScreen = ({ navigation, route }) => {
 
     const dispatch = useDispatch()
 
-
     const onsubmit = () => {
         triggerLogin({ email, password })
     }
 
-     useEffect(() => {
-        //console.log("Resultado del login", result)
+    useEffect(() => {
         (async () => {
             if (result.status === "fulfilled") {
                 try {
@@ -35,7 +36,6 @@ const LoginScreen = ({ navigation, route }) => {
                         dispatch(setUserEmail(result.data.email))
                         dispatch(setLocalId(result.data.localId))
                     }
-                    
                 } catch (error) {
                     console.log("Error al guardar sesión:", error);
                 }
@@ -43,80 +43,87 @@ const LoginScreen = ({ navigation, route }) => {
         })()
     }, [result])
 
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>C-Monster</Text>
-            <Text style={styles.subTitle}>Inicia sesión</Text>
-            <View style={styles.inputContainer}>
-                <TextInput
-                    onChangeText={(text) => setEmail(text)}
-                    placeholderTextColor={colors.white}
-                    placeholder="Email"
-                    style={styles.textInput}
-                />
-                <TextInput
-                    onChangeText={(text) => setPassword(text)}
-                    placeholderTextColor={colors.white}
-                    placeholder='Password'
-                    style={styles.textInput}
-                    secureTextEntry
-                />
-            </View>
-            <View style={styles.footTextContainer}>
-                <Text style={styles.whiteText}>¿No tienes una cuenta?</Text>
-                <Pressable onPress={() => navigation.navigate('Signup')}>
-                    <Text style={
-                        {
-                            ...styles.whiteText,
-                            ...styles.underLineText
-                        }
-                    }>
-                        Crea una
-                    </Text>
-                </Pressable>
-            </View>
+        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+            <View style={styles.overlay} />
+            <View style={styles.container}>
+                <Text style={styles.title}>C-Monster</Text>
+                <Text style={styles.subTitle}>Inicia sesión</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        onChangeText={(text) => setEmail(text)}
+                        placeholderTextColor={colors.white}
+                        placeholder="Email"
+                        style={styles.textInput}
+                    />
+                    <TextInput
+                        onChangeText={(text) => setPassword(text)}
+                        placeholderTextColor={colors.white}
+                        placeholder='Password'
+                        style={styles.textInput}
+                        secureTextEntry
+                    />
+                </View>
+                <View style={styles.footTextContainer}>
+                    <Text style={styles.whiteText}>¿No tienes una cuenta?</Text>
+                    <Pressable onPress={() => navigation.navigate('Signup')}>
+                        <Text style={[styles.whiteText, styles.underLineText]}>
+                            Crea una
+                        </Text>
+                    </Pressable>
+                </View>
 
-            <Pressable style={styles.btn} onPress={onsubmit}><Text style={styles.btnText}>Iniciar sesión</Text></Pressable>
-            <View style={styles.rememberMe}>
-                <Text style={{ color: colors.white }}>¿Mantener sesión iniciada?</Text>
-                <Switch
-                    onValueChange={() => setPersistSession(!persistSession)}
-                    value={persistSession}
-                    trackColor={{ false: '#767577', true: '#81b0ff' }}
-                />
+                <Pressable style={styles.btn} onPress={onsubmit}>
+                    <Text style={styles.btnText}>Iniciar sesión</Text>
+                </Pressable>
+                <View style={styles.rememberMe}>
+                    <Text style={{ color: colors.white }}>¿Mantener sesión iniciada?</Text>
+                    <Switch
+                        onValueChange={() => setPersistSession(!persistSession)}
+                        value={persistSession}
+                        trackColor={{ false: '#767577', true: '#81b0ff' }}
+                    />
+                </View>
             </View>
-        </View>
+        </ImageBackground>
     )
 }
 
 export default LoginScreen
 
 const styles = StyleSheet.create({
+    background: {
+        flex: 1,
+        justifyContent: "center",
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.7)', // oscurece la imagen para dar contraste
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.purple
+        padding: 16,
     },
     title: {
         color: colors.neonGreen,
         fontFamily: "PressStart2P",
-        fontSize: 24
+        fontSize: 24,
+        marginBottom: 8,
     },
     subTitle: {
         fontFamily: "Montserrat",
         fontSize: 18,
         color: colors.neonGreen,
         fontWeight: '700',
-        letterSpacing: 3
+        letterSpacing: 3,
+        marginBottom: 32,
     },
     inputContainer: {
         gap: 16,
-        margin: 16,
-        marginTop: 48,
+        marginBottom: 16,
         alignItems: 'center',
-
     },
     textInput: {
         padding: 8,
@@ -129,6 +136,7 @@ const styles = StyleSheet.create({
     footTextContainer: {
         flexDirection: 'row',
         gap: 8,
+        marginTop: 8,
     },
     whiteText: {
         color: colors.white
@@ -136,32 +144,24 @@ const styles = StyleSheet.create({
     underLineText: {
         textDecorationLine: 'underline',
     },
-    strongText: {
-        fontWeight: '900',
-        fontSize: 16
-    },
     btn: {
         padding: 16,
         paddingHorizontal: 32,
         backgroundColor: colors.black,
         borderRadius: 16,
-        marginTop: 32
+        marginTop: 32,
+        opacity: 0.9,
     },
     btnText: {
         color: colors.white,
         fontSize: 16,
         fontWeight: '700'
     },
-    error: {
-        padding: 16,
-        backgroundColor: colors.red,
-        borderRadius: 8,
-        color: colors.white
-    },
     rememberMe: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        gap: 8
+        gap: 8,
+        marginTop: 24
     }
 })

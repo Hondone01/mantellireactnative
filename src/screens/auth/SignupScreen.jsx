@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react"
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native"
+import {View,Text,TextInput,Pressable,StyleSheet,Dimensions,ImageBackground} from "react-native"
 import { useSignupMutation } from "../../services/authApi"
 import { useDispatch } from "react-redux"
 import { setUserEmail, setLocalId } from "../../store/slices/userSlice"
 import { saveSession } from "../../db"
+import { colors } from "../../global/colors"
+
+// Imagen de fondo
+import bgImage from "../../../assets/duende_cannabis_monstruoso.png"
+
+const textInputWidth = Dimensions.get("window").width * 0.7
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState("")
@@ -26,102 +32,143 @@ const SignupScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (isSuccess && data) {
-      // Guardar sesión en SQLite
       saveSession(data.localId, data.email, data.idToken)
-
-      // Guardar en Redux
       dispatch(setUserEmail(data.email))
       dispatch(setLocalId(data.localId))
     }
   }, [isSuccess, data])
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Crear cuenta</Text>
+    <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <View style={styles.overlay} />
+      <View style={styles.container}>
+        <Text style={styles.title}>C-Monster</Text>
+        <Text style={styles.subTitle}>Crear cuenta</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.textInput}
+            placeholder="Correo electrónico"
+            placeholderTextColor={colors.white}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Contraseña"
+            placeholderTextColor={colors.white}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder="Repetir contraseña"
+            placeholderTextColor={colors.white}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {isError && signupError ? (
+          <Text style={styles.error}>
+            {signupError?.data?.error?.message || "Error al crear cuenta"}
+          </Text>
+        ) : null}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Repetir contraseña"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+        <Pressable style={styles.btn} onPress={onSubmit}>
+          <Text style={styles.btnText}>Registrarse</Text>
+        </Pressable>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      {isError && signupError ? (
-        <Text style={styles.error}>
-          {signupError?.data?.error?.message || "Error al crear cuenta"}
-        </Text>
-      ) : null}
-
-      <Pressable style={styles.button} onPress={onSubmit}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </Pressable>
-
-      <Pressable onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.link}>¿Ya tienes cuenta? Inicia sesión</Text>
-      </Pressable>
-    </View>
+        <View style={styles.footTextContainer}>
+          <Text style={styles.whiteText}>¿Ya tienes cuenta?</Text>
+          <Pressable onPress={() => navigation.navigate("Login")}>
+            <Text style={[styles.whiteText, styles.underLineText]}>
+              Inicia sesión
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </ImageBackground>
   )
 }
 
+export default SignupScreen
+
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.7)",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
-    padding: 20,
-    backgroundColor: "#fff",
+    alignItems: "center",
+    padding: 16,
   },
   title: {
+    color: colors.neonGreen,
+    fontFamily: "PressStart2P",
     fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 8,
     textAlign: "center",
   },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
+  subTitle: {
+    fontFamily: "Montserrat",
+    fontSize: 18,
+    color: colors.neonGreen,
+    fontWeight: "700",
+    letterSpacing: 3,
+    marginBottom: 32,
+    textAlign: "center",
   },
-  button: {
-    backgroundColor: "#4a90e2",
-    padding: 15,
-    borderRadius: 5,
+  inputContainer: {
+    gap: 16,
+    marginBottom: 16,
     alignItems: "center",
-    marginBottom: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  textInput: {
+    padding: 8,
+    paddingLeft: 16,
+    borderRadius: 16,
+    backgroundColor: colors.darkGray,
+    width: textInputWidth,
+    color: colors.white,
   },
-  link: {
-    color: "#4a90e2",
-    textAlign: "center",
-    marginTop: 10,
+  btn: {
+    padding: 16,
+    paddingHorizontal: 32,
+    backgroundColor: colors.black,
+    borderRadius: 16,
+    marginTop: 32,
+    opacity: 0.9,
+  },
+  btnText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  footTextContainer: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 24,
+  },
+  whiteText: {
+    color: colors.white,
+  },
+  underLineText: {
+    textDecorationLine: "underline",
   },
   error: {
     color: "red",
-    marginBottom: 10,
     textAlign: "center",
+    marginTop: 8,
   },
 })
-
-export default SignupScreen
