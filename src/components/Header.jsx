@@ -4,10 +4,14 @@ import { useNavigation } from '@react-navigation/native'
 import Icon from 'react-native-vector-icons/Feather'
 import {Feather} from '@expo/vector-icons'
 import { clearSession } from '../db'
+import { clearUser } from '../store/slices/userSlice'
+import { useDispatch } from 'react-redux'
 
 const Header = ({ title, subtitle }) => {
   const navigation = useNavigation()
   const canGoBack = navigation.canGoBack()
+
+  const dispatch = useDispatch()
 
    const handleClearSession = async () => {
     try {
