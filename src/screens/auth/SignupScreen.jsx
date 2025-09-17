@@ -146,6 +146,8 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingHorizontal: 32,
     backgroundColor: colors.black,
+    borderWidth: 2,
+    borderColor: colors.neonGreen,
     borderRadius: 16,
     marginTop: 32,
     opacity: 0.9,
