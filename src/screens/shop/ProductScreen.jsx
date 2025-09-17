@@ -108,12 +108,12 @@ const styles = StyleSheet.create({
     addToCartButton: {
         padding: 8,
         paddingHorizontal: 16,
-        backgroundColor: colors.purple,
+        backgroundColor: colors.neonGreen,
         borderRadius: 16,
         marginVertical: 16
     },
     textAddToCart: {
-        color: colors.white,
+        color: colors.purple,
         fontSize: 24,
         textAlign: 'center',
     }
